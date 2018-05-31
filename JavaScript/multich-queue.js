@@ -63,8 +63,8 @@ class MultichannelQueue {
         }
       }
       data = data ? data.toString() : data;
-      parsel.push({id, data});
-    })
+      parsel.push({ id, data });
+    });
     return parsel;
   }
 
