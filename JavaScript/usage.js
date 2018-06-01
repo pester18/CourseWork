@@ -1,18 +1,30 @@
 'use strict';
 
-const MultichannelQueue = require('./multich-queue.js')
+const MultichannelQueue = require('./multich-queue.js');
 
 const multQueue = new MultichannelQueue(2, 1);
+multQueue.on('drain', (id) => {
+  console.log(`Channel ${id} is empty`);
+});
+multQueue.on('timeout', (id) => {
+  console.log(`Channel ${id} is timedout`);
+});
+multQueue.on('pick', (parsel) => {
+  console.dir(parsel);
+});
+
 const channel1 = multQueue.addChannel(144);
 const channel2 = multQueue.addChannel(154);
-channel1.push('A');
-channel2.push('B');
-console.dir(multQueue.pick());  //Expected output: [{ id: 144, data: 'A' }, { id: 154, data: 'B' }]
-console.dir(multQueue.pick());  //Expected output: [{ id: 144, data: null }, { id: 154, data: null }]
+
+channel1.push('abcd');
+channel2.push('bdca');
+multQueue.pick();
+multQueue.pick();
+
 setTimeout(() => {
-  console.dir(multQueue.pick());  //Expected output: []
-  channel1.push('def');
-  console.dir(multQueue.pick());  //Expected output: []
+  multQueue.pick();
+  channel1.push('defy');
+  multQueue.pick();
   console.log(channel1.isAlive);  //Expected output: false
   console.log(channel2.isAlive);  //Expected output: false
 }, 2000);
